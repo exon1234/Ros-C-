@@ -1,0 +1,80 @@
+一.工作空间
+1.	环境刷新：source /opt/ros/kinetic/setup.bash
+2.	创建工作空间：catkin_make
+a)	mkdir -p ~/catkin_ws/src
+b)	cd ~/catkin_ws 
+c)	catkin_make：执行创建工作空间，生成devel与build两个文件
+注：catkin_make是CMake工作流中依次调用cmake与make
+3.	source devel/setup.bash将工作空间设置为ros工作环境最高层
+二..文件系统
+	1. rospack find 包名称 (找到软件包路径)
+	2. roscd 包名称 （切换到包位置，相当于cd）
+三．创建程序包catkin_create_pkg
+	1. 进入提前创建的工作空间cd  ~/catkin_ws/src
+	2. catkin_create_pkg [包名 [依赖包 [依赖包
+	3. rospack 查看依赖包
+	4.进入catkin_ws路径执行完成ros程序包编译：catkin_make
+四. ros节点概念rosnode
+	1.roscore （运行程序前要先运行roscore初始化）
+	2.rosnode list（查看在运行的东西（节点））
+	3.rosnode info /rosout 查看rosout节点的详细信息
+	4.roserun [包名称 [节点名称 （直接运行一个包的内部例程）
+五.ros话题rostopic
+	1.两个节点间消息通讯通过一个话题实现
+	2.使用 rosrun rqt_graph rqt_graph 可以查看在运行的节点信息及关系
+	3.rostopic echo 【topic】可以显示某个话题发布的数据
+	例如：rostopic echo /turtle1/cdm_vel
+4.使用rostopic list 查看当前发布的话题
+5.使用rostopic type [topic] 查看通讯的消息类型
+例如：rostopic type /turtle1/cdm_vel
+	6.rostopic pub [topic] [msg_type] [args] 将数据发布到某个正在广播的话题
+		使用 -1参数指定发布后立即断开连接， -r 1 指定以1hz频率持续发送
+	7.rostopic hz [topic] 查看发布频率
+六：ros服务rosservice和rosparam
+1.	Ros Services是节点间另一种通讯方式，request和response方式
+2.	rosservice 提供五种方法
+a)	rosservice list 输出可用服务信息（由运行中的节点提供
+b)	rosservice type 【service】 查看list列出的服务类型（是否需要参数等等）
+c)	rosservice call [service] [args] 根据服务类型调用服务（无需参数忽略args）
+d)	rosservice find 【type】依据服务类型反向寻找服务
+e)	rosservice uri [service] 输出服务的ROSRPCuri
+3.	rosparam提供六种方法，用来存储和操作ros服务器上的数据，包含的数据类型和python一样
+a)	rosparam set 【param_name】 [数值]设置参数
+b)	rosparam get 【param_name】获取参数数值
+c)	rosparam load 从文件读取参数
+d)	rosparam dump 【file_name】向文件写入参数，默认写入所有数据
+e)	rosparam delete 删除参数
+f)	rosparam list 列出参数
+七.rpt_console（用来显示节点输出信息）和roslaunch（用来运行定义在.launch文件中的多个节点）
+	1.rosrun rqt_console rqt_console （窗口显示日志输出信息
+2.rosrun rqt_logger_level rqt_logger_level   调整日志等级
+3.roslaunch [package] [filename.launch]
+	用法：进入程序包目录下，创建launch文件夹，在文件夹下穿件.launch文件
+	.launch文件内容以<launch>开始并以此结束
+	4.rosed用来编辑ros文件，属于rosbash一部分
+		Rosed [package_name] [field_name]
+八.ROS消息（msg）和ROS服务（srv）
+	1.msg与srv文件夹在程序包目录下，
+.msg文件每行声明一个变量类型和变量名
+		.srv文件分为请求和响应两部分数据，使用---分隔，格式与.msg一样
+	2.rosmsg show 【package/type】:ros查看能否识别消息
+rossrv show 【package/type】:ros查看能否识别服务
+	3.使用msg与srv需要在CmakeList.txt文件去掉注释
+九.编写消息发布器和订阅器，服务器service以及客户端client
+	1.节点node是ROS网络中的可执行文件，发布器节点可以不断地发布消息。
+	订阅器节点接受消息进行处理
+	2.使用c++  python编写
+	3.编写完成进入工作空间catkin_ws目录下，执行catkin_make完成节点建立
+
+十.录制与回放数据rosbag
+	1.运行节点服务
+	2.录制当前运行的数据：
+		a）mkdir ~/bagfile
+		b）cd ~/bagfile
+		c）rosbag record –a  ：将所有数据录制到一个.bag文件，结束录制按ctrl+c
+		d）rosbag info 【bag】 :查看录制的数据包信息
+		e）rosplay 【bag】   ：回放录取的数据包 使用-r 2 指定消息发布频率，代表2倍
+	3.数据子集录制（只录制一个或几个话题）
+		rosbag record –o subset  /turtle1/cmd_evl  /turtle1/pos
+		-o指定只录取数据保存名为subset.bag的文件中。后面说明录取的topic
+ 
